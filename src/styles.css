@@ -1,0 +1,136 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * Ciranda — Edição Dona de Mim
+ * Paleta cream + terracotta + marrom profundo
+ */
+
+@theme inline {
+  --font-serif: "Cormorant Garamond", "Times New Roman", serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-card: var(--surface-card);
+  --color-border: var(--border-soft);
+}
+
+:root {
+  --background: oklch(0.965 0.02 78);            /* cream quente */
+  --surface-soft: oklch(0.945 0.025 75);
+  --surface-card: oklch(0.985 0.012 82);
+  --foreground: oklch(0.255 0.04 38);             /* marrom profundo */
+  --muted: oklch(0.92 0.02 70);
+  --muted-foreground: oklch(0.48 0.05 42);
+  --primary: oklch(0.52 0.13 38);                 /* terracotta queimado */
+  --primary-foreground: oklch(0.99 0 0);
+  --accent: oklch(0.78 0.07 40);                  /* rose dourado suave */
+  --accent-rose: oklch(0.88 0.04 28);
+  --border-soft: oklch(0.86 0.02 60);
+  --deep: oklch(0.24 0.05 35);                    /* footer */
+  --deep-foreground: oklch(0.96 0.01 70);
+
+  --shadow-card: 0 30px 60px -30px rgba(75, 40, 20, 0.18);
+  --shadow-soft: 0 10px 30px -15px rgba(75, 40, 20, 0.12);
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, .font-serif {
+    font-family: var(--font-serif);
+    letter-spacing: -0.01em;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 30%, transparent);
+  }
+}
+
+@layer utilities {
+  .accent-text {
+    color: var(--primary);
+    font-style: italic;
+    font-family: var(--font-serif);
+  }
+  .container-x {
+    margin-inline: auto;
+    max-width: 1240px;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .container-x { padding-inline: 2rem; }
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    border: 1px solid var(--border-soft);
+    background: var(--surface-card);
+    padding: 0.4rem 0.95rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+  .chip-dot {
+    width: 6px; height: 6px; border-radius: 9999px;
+    background: var(--primary);
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 0.55rem;
+    border-radius: 9999px;
+    background: var(--primary);
+    color: #fff;
+    padding: 0.95rem 1.55rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    box-shadow: 0 18px 35px -16px color-mix(in oklab, var(--primary) 70%, transparent);
+    transition: transform .3s ease, box-shadow .3s ease, opacity .3s ease;
+  }
+  .btn-primary:hover { transform: translateY(-1px); opacity: 0.97; }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 0.55rem;
+    border-radius: 9999px;
+    background: var(--surface-card);
+    color: var(--foreground);
+    border: 1px solid var(--border-soft);
+    padding: 0.95rem 1.55rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    transition: border-color .3s ease, background .3s ease;
+  }
+  .btn-ghost:hover { border-color: color-mix(in oklab, var(--primary) 40%, var(--border-soft)); }
+  .card-soft {
+    background: var(--surface-card);
+    border: 1px solid var(--border-soft);
+    border-radius: 18px;
+    box-shadow: var(--shadow-soft);
+  }
+  .eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+  .divider-thin {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border-soft), transparent);
+  }
+}
