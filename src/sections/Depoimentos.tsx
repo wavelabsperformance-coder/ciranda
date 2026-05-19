@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
 const depoimentos = [
   {
@@ -29,10 +29,7 @@ const depoimentos = [
 export default function Depoimentos() {
   const scroller = useRef<HTMLDivElement>(null);
 
-  // ✅ FIX TYPE: array tipado corretamente
   const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
-
-  const [activeVideo, setActiveVideo] = useState<number | null>(null);
 
   const showArrows = depoimentos.length > 3;
 
@@ -43,53 +40,31 @@ export default function Depoimentos() {
     });
   };
 
-  // ✅ PLAY / PAUSE UNIFICADO (mobile + desktop)
-  const handleVideoClick = async (index: number) => {
+  // PREVIEW APENAS DESKTOP
+  const handleHoverPlay = async (index: number) => {
+    if (window.innerWidth < 768) return;
+
     const video = videoRefs.current[index];
+
     if (!video) return;
 
     try {
-      const isPlaying = !video.paused;
-
-      setActiveVideo(index);
-
-      video.muted = false;
-      video.playsInline = true;
-
-      if (isPlaying) {
-        video.pause();
-        setActiveVideo(null);
-      } else {
-        await video.play();
-      }
+      video.muted = true;
+      await video.play();
     } catch (error) {
       console.log(error);
     }
   };
 
-  // ✅ hover só desktop (não quebra mobile)
-  const handleHoverPlay = async (index: number) => {
-    const video = videoRefs.current[index];
-    if (!video) return;
-
-    if (activeVideo !== index) {
-      try {
-        video.muted = true;
-        await video.play();
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-
   const handleHoverLeave = (index: number) => {
+    if (window.innerWidth < 768) return;
+
     const video = videoRefs.current[index];
+
     if (!video) return;
 
-    if (activeVideo !== index) {
-      video.pause();
-      video.currentTime = 0;
-    }
+    video.pause();
+    video.currentTime = 0;
   };
 
   return (
@@ -114,14 +89,16 @@ export default function Depoimentos() {
             <div className="hidden gap-2 md:flex">
               <button
                 onClick={() => scroll(-1)}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card"
+                aria-label="Anterior"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card transition-all duration-300 hover:border-primary hover:text-primary"
               >
                 <ChevronLeft size={18} />
               </button>
 
               <button
                 onClick={() => scroll(1)}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card"
+                aria-label="Próximo"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card transition-all duration-300 hover:border-primary hover:text-primary"
               >
                 <ChevronRight size={18} />
               </button>
@@ -160,51 +137,49 @@ export default function Depoimentos() {
                   }}
                   src={d.video}
                   playsInline
-                  preload="metadata"
-                  controls={activeVideo === i}
-                  className="aspect-[9/16] w-full cursor-pointer object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
-                  onClick={() => handleVideoClick(i)}
+                  muted
+                  preload="auto"
+                  controls
+                  className="aspect-[9/16] w-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
                   onMouseEnter={() => handleHoverPlay(i)}
                   onMouseLeave={() => handleHoverLeave(i)}
                 />
 
                 {/* OVERLAY */}
-                {activeVideo !== i && (
-                  <>
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent transition-all duration-700 group-hover:from-black/20 group-hover:via-transparent" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent transition-all duration-700 group-hover:from-black/20 group-hover:via-transparent" />
 
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5">
-                      <div className="max-w-xs">
-                        <p className="font-serif text-lg italic leading-snug text-white">
-                          "{d.quote}"
-                        </p>
+                {/* TEXTO */}
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5">
+                  <div className="max-w-xs">
+                    <p className="font-serif text-lg italic leading-snug text-white">
+                      "{d.quote}"
+                    </p>
 
-                        <div className="mt-4 flex items-center gap-3">
-                          <span className="h-px w-8 bg-white/50" />
-                          <p className="text-sm font-medium text-white">
-                            {d.name}
-                          </p>
-                        </div>
-                      </div>
+                    <div className="mt-4 flex items-center gap-3">
+                      <span className="h-px w-8 bg-white/50" />
+
+                      <p className="text-sm font-medium text-white">
+                        {d.name}
+                      </p>
                     </div>
-                  </>
-                )}
+                  </div>
+                </div>
               </div>
 
               {/* FOOTER */}
-              {activeVideo === i && (
-                <figcaption className="mt-5 px-1">
-                  <div className="flex items-center gap-3">
-                    <span className="h-px w-8 bg-primary/60" />
-                    <p className="text-sm font-medium text-foreground">
-                      {d.name}
-                    </p>
-                    <span className="text-xs text-muted-foreground">
-                      · {d.role}
-                    </span>
-                  </div>
-                </figcaption>
-              )}
+              <figcaption className="mt-5 px-1">
+                <div className="flex items-center gap-3">
+                  <span className="h-px w-8 bg-primary/60" />
+
+                  <p className="text-sm font-medium text-foreground">
+                    {d.name}
+                  </p>
+
+                  <span className="text-xs text-muted-foreground">
+                    · {d.role}
+                  </span>
+                </div>
+              </figcaption>
             </motion.figure>
           ))}
         </div>
@@ -217,8 +192,14 @@ export default function Depoimentos() {
             ["4.9★", "Avaliação média"],
             ["98%", "Recomendariam"],
           ].map(([n, l]) => (
-            <div key={l} className="bg-card p-7 text-center">
-              <p className="font-serif text-4xl text-primary">{n}</p>
+            <div
+              key={l}
+              className="bg-card p-7 text-center"
+            >
+              <p className="font-serif text-4xl text-primary">
+                {n}
+              </p>
+
               <p className="mt-2 text-xs uppercase tracking-[0.22em] text-muted-foreground">
                 {l}
               </p>
