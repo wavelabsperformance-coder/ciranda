@@ -40,35 +40,6 @@ export default function Depoimentos() {
     });
   };
 
-  // ✅ PREVIEW DESKTOP
-  const handleHoverPlay = async (index: number) => {
-    // MOBILE IGNORA HOVER
-    if (window.innerWidth < 768) return;
-
-    const video = videoRefs.current[index];
-
-    if (!video) return;
-
-    try {
-      video.muted = true;
-      await video.play();
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const handleHoverLeave = (index: number) => {
-    // MOBILE IGNORA HOVER
-    if (window.innerWidth < 768) return;
-
-    const video = videoRefs.current[index];
-
-    if (!video) return;
-
-    video.pause();
-    video.currentTime = 0;
-  };
-
   return (
     <section className="relative py-10 md:py-10">
       <div className="mx-auto max-w-7xl px-6 md:px-10">
@@ -136,16 +107,75 @@ export default function Depoimentos() {
                 <video
                   ref={(el) => {
                     videoRefs.current[i] = el;
+
+                    // 🔥 força thumb/frame aparecer no iPhone
+                    if (el) {
+                      el.currentTime = 0.1;
+                    }
                   }}
                   src={d.video}
-                  poster={d.video}
                   muted
                   playsInline
                   preload="metadata"
-                  loop
-                  className="relative z-10 aspect-[9/16] w-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
-                  onMouseEnter={() => handleHoverPlay(i)}
-                  onMouseLeave={() => handleHoverLeave(i)}
+                  className="relative z-10 aspect-[9/16] w-full cursor-pointer object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
+
+                  // ✅ PREVIEW DESKTOP
+                  onMouseEnter={async (e) => {
+                    if (window.innerWidth < 768) return;
+
+                    const video = e.currentTarget;
+
+                    if (!video.controls) {
+                      try {
+                        video.muted = true;
+                        await video.play();
+                      } catch {}
+                    }
+                  }}
+
+                  onMouseLeave={(e) => {
+                    if (window.innerWidth < 768) return;
+
+                    const video = e.currentTarget;
+
+                    if (!video.controls) {
+                      video.pause();
+                      video.currentTime = 0.1;
+                    }
+                  }}
+
+                  // ✅ TOUCH MOBILE + CLICK
+                  onClick={async (e) => {
+                    const video = e.currentTarget;
+
+                    // PRIMEIRO CLICK = PREVIEW
+                    if (!video.controls && video.paused) {
+                      try {
+                        video.muted = true;
+                        await video.play();
+
+                        // pausa preview depois de 2s
+                        setTimeout(() => {
+                          if (!video.controls) {
+                            video.pause();
+                            video.currentTime = 0.1;
+                          }
+                        }, 2000);
+
+                        return;
+                      } catch {}
+                    }
+
+                    // SEGUNDO CLICK = PLAYER COMPLETO
+                    if (!video.controls) {
+                      video.controls = true;
+                      video.muted = false;
+
+                      try {
+                        await video.play();
+                      } catch {}
+                    }
+                  }}
                 />
 
                 {/* OVERLAY */}
