@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 const depoimentos = [
   {
@@ -40,33 +40,9 @@ export default function Depoimentos() {
     });
   };
 
-  // ✅ FORÇA FRAME VISÍVEL NO MOBILE/IPHONE
-  useEffect(() => {
-    videoRefs.current.forEach((video) => {
-      if (!video) return;
-
-      video.muted = true;
-      video.playsInline = true;
-
-      const forceFrame = async () => {
-        try {
-          await video.play();
-
-          setTimeout(() => {
-            video.pause();
-            video.currentTime = 0.1;
-          }, 80);
-        } catch (err) {
-          console.log(err);
-        }
-      };
-
-      forceFrame();
-    });
-  }, []);
-
   // ✅ PREVIEW DESKTOP
   const handleHoverPlay = async (index: number) => {
+    // MOBILE IGNORA HOVER
     if (window.innerWidth < 768) return;
 
     const video = videoRefs.current[index];
@@ -82,6 +58,7 @@ export default function Depoimentos() {
   };
 
   const handleHoverLeave = (index: number) => {
+    // MOBILE IGNORA HOVER
     if (window.innerWidth < 768) return;
 
     const video = videoRefs.current[index];
@@ -89,7 +66,7 @@ export default function Depoimentos() {
     if (!video) return;
 
     video.pause();
-    video.currentTime = 0.1;
+    video.currentTime = 0;
   };
 
   return (
@@ -161,18 +138,18 @@ export default function Depoimentos() {
                     videoRefs.current[i] = el;
                   }}
                   src={d.video}
+                  poster={d.video}
                   muted
                   playsInline
-                  preload="auto"
-                  controls
+                  preload="metadata"
                   loop
-                  className="relative z-10 aspect-[9/16] w-full object-cover transition-transform duration-[1.4s] ease-out"
+                  className="relative z-10 aspect-[9/16] w-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
                   onMouseEnter={() => handleHoverPlay(i)}
                   onMouseLeave={() => handleHoverLeave(i)}
                 />
 
                 {/* OVERLAY */}
-                <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+                <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-t from-black/50 via-black/10 to-transparent transition-all duration-700 group-hover:from-black/20 group-hover:via-transparent" />
 
                 {/* TEXTO */}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 p-5">
