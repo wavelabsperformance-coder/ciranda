@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 const depoimentos = [
   {
@@ -30,6 +30,8 @@ export default function Depoimentos() {
   const scroller = useRef<HTMLDivElement>(null);
 
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+
+  const [activeVideo, setActiveVideo] = useState<number | null>(null);
 
   const showArrows = depoimentos.length > 3;
 
@@ -108,7 +110,7 @@ export default function Depoimentos() {
                   ref={(el) => {
                     videoRefs.current[i] = el;
 
-                    // 🔥 força thumb/frame aparecer no iPhone
+                    // força thumb/frame no iPhone
                     if (el) {
                       el.currentTime = 0.1;
                     }
@@ -117,9 +119,9 @@ export default function Depoimentos() {
                   muted
                   playsInline
                   preload="metadata"
-                  className="relative z-10 aspect-[9/16] w-full cursor-pointer object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
+                  className="relative z-10 aspect-[9/16] w-full cursor-pointer object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105 [&::-webkit-media-controls-start-playback-button]:hidden"
 
-                  // ✅ PREVIEW DESKTOP
+                  // PREVIEW DESKTOP
                   onMouseEnter={async (e) => {
                     const video = e.currentTarget;
 
@@ -140,7 +142,7 @@ export default function Depoimentos() {
                     }
                   }}
 
-                  // ✅ TOUCH MOBILE = PREVIEW
+                  // TOUCH MOBILE = PREVIEW
                   onTouchStart={async (e) => {
                     const video = e.currentTarget;
 
@@ -161,14 +163,13 @@ export default function Depoimentos() {
                     }
                   }}
 
-                  // ✅ CLICK REAL = PLAYER REAL
+                  // CLICK = PLAYER REAL
                   onClick={async (e) => {
                     const video = e.currentTarget;
 
-                    // ativa controls
-                    video.controls = true;
+                    setActiveVideo(i);
 
-                    // ativa som
+                    video.controls = true;
                     video.muted = false;
 
                     try {
@@ -177,25 +178,28 @@ export default function Depoimentos() {
                   }}
                 />
 
-                {/* OVERLAY */}
-                <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-t from-black/50 via-black/10 to-transparent transition-all duration-700 group-hover:from-black/20 group-hover:via-transparent" />
+                {/* OVERLAY + TEXTO */}
+                {activeVideo !== i && (
+                  <>
+                    <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-t from-black/50 via-black/10 to-transparent transition-all duration-700 group-hover:from-black/20 group-hover:via-transparent" />
 
-                {/* TEXTO */}
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 p-5">
-                  <div className="max-w-xs">
-                    <p className="font-serif text-lg italic leading-snug text-white">
-                      "{d.quote}"
-                    </p>
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 p-5">
+                      <div className="max-w-xs">
+                        <p className="font-serif text-lg italic leading-snug text-white">
+                          "{d.quote}"
+                        </p>
 
-                    <div className="mt-4 flex items-center gap-3">
-                      <span className="h-px w-8 bg-white/50" />
+                        <div className="mt-4 flex items-center gap-3">
+                          <span className="h-px w-8 bg-white/50" />
 
-                      <p className="text-sm font-medium text-white">
-                        {d.name}
-                      </p>
+                          <p className="text-sm font-medium text-white">
+                            {d.name}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </>
+                )}
               </div>
 
               {/* FOOTER */}
