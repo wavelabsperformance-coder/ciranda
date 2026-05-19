@@ -4,19 +4,19 @@ const vivencias = [
   {
     num: "01",
     img: "/images/vivencia-1.jpeg",
-    title: "Dança e Expressão Feminina",
+    title: "Exercícios sensoriais",
     text: "Vivências corporais e dança que libertam o que as palavras não alcançam.",
   },
   {
     num: "02",
     img: "/images/vivencia-2.jpeg",
-    title: "Rituais com os Elementos",
+    title: "Banhos terapêuticos medicinais",
     text: "Conexão sagrada com água, terra, fogo e ar para ativar sua transformação.",
   },
   {
     num: "03",
     img: "/images/vivencia-3.jpeg",
-    title: "Movimentos Sistêmicos",
+    title: "Transmutação no fogo sagrado",
     text: "Desbloqueios emocionais e movimentos que reorganizam padrões profundos.",
   },
   {
@@ -37,7 +37,7 @@ export default function Vivencias() {
         <Reveal delay={0.05}>
           <h2 className="mt-4 max-w-3xl font-serif text-4xl leading-[1.05] text-[color:var(--foreground)] md:text-5xl">
             Conexão profunda com{" "}
-            <span className="accent-text not-italic md:italic">corpo, alma e espírito.</span>
+            <span className="accent-text not-italic md:italic">corpo, mente e alma.</span>
           </h2>
         </Reveal>
 

@@ -13,7 +13,7 @@ const faqs = [
   },
   {
     q: "O que está incluso no investimento?",
-    a: "Imersão completa de um dia na Fazenda Saint Germain, condução, rituais, vivências, alimentação consciente e material de apoio.",
+    a: "Imersão completa de um dia na Fazenda Saint Germain, transporte, rituais, vivências, alimentação consciente e material de apoio.",
   },
   {
     q: "Como funcionam as formas de pagamento?",

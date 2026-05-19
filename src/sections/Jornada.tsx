@@ -10,7 +10,7 @@ const etapas = [
   {
     n: "02",
     title: "Vivências",
-    desc: "Rituais e experiências guiadas que tocam o corpo e a alma.",
+    desc: "Meditações e experiências guiadas que tocam corpo e alma.",
   },
   {
     n: "03",
