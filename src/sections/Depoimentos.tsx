@@ -121,11 +121,9 @@ export default function Depoimentos() {
 
                   // ✅ PREVIEW DESKTOP
                   onMouseEnter={async (e) => {
-                    if (window.innerWidth < 768) return;
-
                     const video = e.currentTarget;
 
-                    if (!video.controls) {
+                    if (window.innerWidth >= 768 && !video.controls) {
                       try {
                         video.muted = true;
                         await video.play();
@@ -134,8 +132,27 @@ export default function Depoimentos() {
                   }}
 
                   onMouseLeave={(e) => {
-                    if (window.innerWidth < 768) return;
+                    const video = e.currentTarget;
 
+                    if (window.innerWidth >= 768 && !video.controls) {
+                      video.pause();
+                      video.currentTime = 0.1;
+                    }
+                  }}
+
+                  // ✅ TOUCH MOBILE = PREVIEW
+                  onTouchStart={async (e) => {
+                    const video = e.currentTarget;
+
+                    if (!video.controls) {
+                      try {
+                        video.muted = true;
+                        await video.play();
+                      } catch {}
+                    }
+                  }}
+
+                  onTouchEnd={(e) => {
                     const video = e.currentTarget;
 
                     if (!video.controls) {
@@ -144,37 +161,19 @@ export default function Depoimentos() {
                     }
                   }}
 
-                  // ✅ TOUCH MOBILE + CLICK
+                  // ✅ CLICK REAL = PLAYER REAL
                   onClick={async (e) => {
                     const video = e.currentTarget;
 
-                    // PRIMEIRO CLICK = PREVIEW
-                    if (!video.controls && video.paused) {
-                      try {
-                        video.muted = true;
-                        await video.play();
+                    // ativa controls
+                    video.controls = true;
 
-                        // pausa preview depois de 2s
-                        setTimeout(() => {
-                          if (!video.controls) {
-                            video.pause();
-                            video.currentTime = 0.1;
-                          }
-                        }, 2000);
+                    // ativa som
+                    video.muted = false;
 
-                        return;
-                      } catch {}
-                    }
-
-                    // SEGUNDO CLICK = PLAYER COMPLETO
-                    if (!video.controls) {
-                      video.controls = true;
-                      video.muted = false;
-
-                      try {
-                        await video.play();
-                      } catch {}
-                    }
+                    try {
+                      await video.play();
+                    } catch {}
                   }}
                 />
 
