@@ -110,71 +110,78 @@ export default function Depoimentos() {
                   ref={(el) => {
                     videoRefs.current[i] = el;
 
-                    // força thumb/frame no iPhone
+                    // força thumb/frame no mobile
                     if (el) {
                       el.currentTime = 0.1;
                     }
                   }}
                   src={d.video}
-                  muted
+                  muted={activeVideo !== i}
                   playsInline
                   preload="metadata"
-                  className="relative z-10 aspect-[9/16] w-full cursor-pointer object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105 [&::-webkit-media-controls-start-playback-button]:hidden"
+                  controls={activeVideo === i}
+                  disablePictureInPicture
+                  controlsList="nodownload noplaybackrate"
+                  className="
+                    relative z-10 aspect-[9/16] w-full cursor-pointer object-cover
+                    transition-transform duration-[1.4s] ease-out group-hover:scale-105
+                    [&::-webkit-media-controls-start-playback-button]:hidden
+                    [&::-webkit-media-controls-overlay-play-button]:hidden
+                  "
 
                   // PREVIEW DESKTOP
                   onMouseEnter={async (e) => {
+                    if (window.innerWidth < 768) return;
+
                     const video = e.currentTarget;
 
-                    if (window.innerWidth >= 768 && !video.controls) {
+                    if (activeVideo !== i) {
                       try {
-                        video.muted = true;
                         await video.play();
                       } catch {}
                     }
                   }}
 
                   onMouseLeave={(e) => {
+                    if (window.innerWidth < 768) return;
+
                     const video = e.currentTarget;
 
-                    if (window.innerWidth >= 768 && !video.controls) {
+                    if (activeVideo !== i) {
                       video.pause();
                       video.currentTime = 0.1;
                     }
                   }}
 
-                  // TOUCH MOBILE = PREVIEW
-                  onTouchStart={async (e) => {
-                    const video = e.currentTarget;
-
-                    if (!video.controls) {
-                      try {
-                        video.muted = true;
-                        await video.play();
-                      } catch {}
-                    }
-                  }}
-
-                  onTouchEnd={(e) => {
-                    const video = e.currentTarget;
-
-                    if (!video.controls) {
-                      video.pause();
-                      video.currentTime = 0.1;
-                    }
-                  }}
-
-                  // CLICK = PLAYER REAL
+                  // PLAYER REAL
                   onClick={async (e) => {
                     const video = e.currentTarget;
 
+                    // pausa outros vídeos
+                    videoRefs.current.forEach((v, index) => {
+                      if (v && index !== i) {
+                        v.pause();
+                        v.currentTime = 0.1;
+                      }
+                    });
+
+                    // ativa player atual
                     setActiveVideo(i);
 
-                    video.controls = true;
                     video.muted = false;
 
                     try {
                       await video.play();
                     } catch {}
+                  }}
+
+                  // quando pausar remove player
+                  onPause={(e) => {
+                    const video = e.currentTarget;
+
+                    if (video.currentTime < video.duration) {
+                      setActiveVideo(null);
+                    }
                   }}
                 />
 
