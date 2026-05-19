@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 const depoimentos = [
   {
@@ -29,7 +29,7 @@ const depoimentos = [
 export default function Depoimentos() {
   const scroller = useRef<HTMLDivElement>(null);
 
-  const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   const showArrows = depoimentos.length > 3;
 
@@ -40,9 +40,33 @@ export default function Depoimentos() {
     });
   };
 
-  // ✅ PREVIEW APENAS DESKTOP
+  // ✅ FORÇA FRAME VISÍVEL NO MOBILE/IPHONE
+  useEffect(() => {
+    videoRefs.current.forEach((video) => {
+      if (!video) return;
+
+      video.muted = true;
+      video.playsInline = true;
+
+      const forceFrame = async () => {
+        try {
+          await video.play();
+
+          setTimeout(() => {
+            video.pause();
+            video.currentTime = 0.1;
+          }, 80);
+        } catch (err) {
+          console.log(err);
+        }
+      };
+
+      forceFrame();
+    });
+  }, []);
+
+  // ✅ PREVIEW DESKTOP
   const handleHoverPlay = async (index: number) => {
-    // MOBILE IGNORA HOVER
     if (window.innerWidth < 768) return;
 
     const video = videoRefs.current[index];
@@ -52,13 +76,12 @@ export default function Depoimentos() {
     try {
       video.muted = true;
       await video.play();
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
     }
   };
 
   const handleHoverLeave = (index: number) => {
-    // MOBILE IGNORA HOVER
     if (window.innerWidth < 768) return;
 
     const video = videoRefs.current[index];
@@ -66,8 +89,6 @@ export default function Depoimentos() {
     if (!video) return;
 
     video.pause();
-
-    // 🔥 VOLTA PRO FRAME INICIAL
     video.currentTime = 0.1;
   };
 
@@ -132,34 +153,29 @@ export default function Depoimentos() {
                   : ""
               }`}
             >
-              <div className="relative overflow-hidden rounded-[1.75rem] bg-foreground/5 shadow-xl shadow-black/5">
+              <div className="relative isolate overflow-hidden rounded-[1.75rem] bg-foreground/5 shadow-xl shadow-black/5">
 
                 {/* VIDEO */}
                 <video
                   ref={(el) => {
                     videoRefs.current[i] = el;
-
-                    // 🔥 FORÇA O FRAME APARECER NO IPHONE
-                    if (el) {
-                      el.currentTime = 0.1;
-                    }
                   }}
                   src={d.video}
                   muted
-                  loop
                   playsInline
-                  preload="metadata"
+                  preload="auto"
                   controls
-                  className="aspect-[9/16] w-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
+                  loop
+                  className="relative z-10 aspect-[9/16] w-full object-cover transition-transform duration-[1.4s] ease-out"
                   onMouseEnter={() => handleHoverPlay(i)}
                   onMouseLeave={() => handleHoverLeave(i)}
                 />
 
                 {/* OVERLAY */}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent transition-all duration-700 group-hover:from-black/20 group-hover:via-transparent" />
+                <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
 
                 {/* TEXTO */}
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5">
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 p-5">
                   <div className="max-w-xs">
                     <p className="font-serif text-lg italic leading-snug text-white">
                       "{d.quote}"
