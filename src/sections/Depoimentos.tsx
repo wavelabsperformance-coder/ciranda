@@ -110,24 +110,29 @@ export default function Depoimentos() {
                   ref={(el) => {
                     videoRefs.current[i] = el;
 
-                    // força thumb/frame no mobile
+                    // força thumb no mobile
                     if (el) {
                       el.currentTime = 0.1;
                     }
                   }}
                   src={d.video}
-                  muted={activeVideo !== i}
                   playsInline
                   preload="metadata"
-                  controls={activeVideo === i}
+                  controls
+                  muted={activeVideo !== i}
                   disablePictureInPicture
                   controlsList="nodownload noplaybackrate"
-                  className="
+                  className={`
                     relative z-10 aspect-[9/16] w-full cursor-pointer object-cover
                     transition-transform duration-[1.4s] ease-out group-hover:scale-105
-                    [&::-webkit-media-controls-start-playback-button]:hidden
                     [&::-webkit-media-controls-overlay-play-button]:hidden
-                  "
+                    [&::-webkit-media-controls-start-playback-button]:hidden
+                    ${
+                      activeVideo !== i
+                        ? "[&::-webkit-media-controls]:opacity-0"
+                        : "[&::-webkit-media-controls]:opacity-100"
+                    }
+                  `}
 
                   // PREVIEW DESKTOP
                   onMouseEnter={async (e) => {
@@ -137,6 +142,7 @@ export default function Depoimentos() {
 
                     if (activeVideo !== i) {
                       try {
+                        video.muted = true;
                         await video.play();
                       } catch {}
                     }
@@ -154,7 +160,7 @@ export default function Depoimentos() {
                   }}
 
                   // PLAYER REAL
-                  onClick={async (e) => {
+                  onClick={(e) => {
                     const video = e.currentTarget;
 
                     // pausa outros vídeos
@@ -168,20 +174,8 @@ export default function Depoimentos() {
                     // ativa player atual
                     setActiveVideo(i);
 
+                    // ativa som
                     video.muted = false;
-
-                    try {
-                      await video.play();
-                    } catch {}
-                  }}
-
-                  // quando pausar remove player
-                  onPause={(e) => {
-                    const video = e.currentTarget;
-
-                    if (video.currentTime < video.duration) {
-                      setActiveVideo(null);
-                    }
                   }}
                 />
 
