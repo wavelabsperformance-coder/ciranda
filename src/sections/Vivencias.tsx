@@ -3,25 +3,25 @@ import Reveal from "@/components/Reveal";
 const vivencias = [
   {
     num: "01",
-    img: "/images/vivencia-1.jpg",
+    img: "/images/vivencia-1.jpeg",
     title: "Dança e Expressão Feminina",
     text: "Vivências corporais e dança que libertam o que as palavras não alcançam.",
   },
   {
     num: "02",
-    img: "/images/vivencia-2.jpg",
+    img: "/images/vivencia-2.jpeg",
     title: "Rituais com os Elementos",
     text: "Conexão sagrada com água, terra, fogo e ar para ativar sua transformação.",
   },
   {
     num: "03",
-    img: "/images/vivencia-3.jpg",
+    img: "/images/vivencia-3.jpeg",
     title: "Movimentos Sistêmicos",
     text: "Desbloqueios emocionais e movimentos que reorganizam padrões profundos.",
   },
   {
     num: "04",
-    img: "/images/vivencia-4.jpg",
+    img: "/images/vivencia-4.jpeg",
     title: "Expansão da Consciência",
     text: "Abertura de caminhos sob a energia viva da Fazenda Saint Germain.",
   },

@@ -2,15 +2,6 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef, useState } from "react";
 
-/**
- * EDIÇÃO:
- * Coloque os vídeos em:
- * /public/videos/
- *
- * Exemplo:
- * /public/videos/depoimento-1.mp4
- */
-
 const depoimentos = [
   {
     name: "Edvane Libório.",
@@ -38,6 +29,9 @@ const depoimentos = [
 export default function Depoimentos() {
   const scroller = useRef<HTMLDivElement>(null);
 
+  // ✅ FIX TYPE: array tipado corretamente
+  const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
+
   const [activeVideo, setActiveVideo] = useState<number | null>(null);
 
   const showArrows = depoimentos.length > 3;
@@ -49,10 +43,35 @@ export default function Depoimentos() {
     });
   };
 
-  const handleHoverPlay = async (
-    video: HTMLVideoElement,
-    index: number
-  ) => {
+  // ✅ PLAY / PAUSE UNIFICADO (mobile + desktop)
+  const handleVideoClick = async (index: number) => {
+    const video = videoRefs.current[index];
+    if (!video) return;
+
+    try {
+      const isPlaying = !video.paused;
+
+      setActiveVideo(index);
+
+      video.muted = false;
+      video.playsInline = true;
+
+      if (isPlaying) {
+        video.pause();
+        setActiveVideo(null);
+      } else {
+        await video.play();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // ✅ hover só desktop (não quebra mobile)
+  const handleHoverPlay = async (index: number) => {
+    const video = videoRefs.current[index];
+    if (!video) return;
+
     if (activeVideo !== index) {
       try {
         video.muted = true;
@@ -63,35 +82,21 @@ export default function Depoimentos() {
     }
   };
 
-  const handleHoverLeave = (
-    video: HTMLVideoElement,
-    index: number
-  ) => {
+  const handleHoverLeave = (index: number) => {
+    const video = videoRefs.current[index];
+    if (!video) return;
+
     if (activeVideo !== index) {
       video.pause();
       video.currentTime = 0;
     }
   };
 
-  const handleVideoClick = async (
-    video: HTMLVideoElement,
-    index: number
-  ) => {
-    try {
-      setActiveVideo(index);
-
-      video.controls = true;
-      video.muted = false;
-
-      await video.play();
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   return (
     <section className="relative py-10 md:py-10">
       <div className="mx-auto max-w-7xl px-6 md:px-10">
+
+        {/* HEADER */}
         <div className="flex items-end justify-between gap-6">
           <div className="max-w-2xl">
             <p className="eyebrow">Depoimentos</p>
@@ -109,16 +114,14 @@ export default function Depoimentos() {
             <div className="hidden gap-2 md:flex">
               <button
                 onClick={() => scroll(-1)}
-                aria-label="Anterior"
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card transition-all duration-300 hover:border-primary hover:text-primary"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card"
               >
                 <ChevronLeft size={18} />
               </button>
 
               <button
                 onClick={() => scroll(1)}
-                aria-label="Próximo"
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card transition-all duration-300 hover:border-primary hover:text-primary"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card"
               >
                 <ChevronRight size={18} />
               </button>
@@ -126,6 +129,7 @@ export default function Depoimentos() {
           )}
         </div>
 
+        {/* LISTA */}
         <div
           ref={scroller}
           className={`mt-14 ${
@@ -148,23 +152,23 @@ export default function Depoimentos() {
               }`}
             >
               <div className="relative overflow-hidden rounded-[1.75rem] bg-foreground/5 shadow-xl shadow-black/5">
+
+                {/* VIDEO */}
                 <video
+                  ref={(el) => {
+                    videoRefs.current[i] = el;
+                  }}
                   src={d.video}
                   playsInline
                   preload="metadata"
                   controls={activeVideo === i}
-                  onMouseEnter={(e) =>
-                    handleHoverPlay(e.currentTarget, i)
-                  }
-                  onMouseLeave={(e) =>
-                    handleHoverLeave(e.currentTarget, i)
-                  }
-                  onClick={(e) =>
-                    handleVideoClick(e.currentTarget, i)
-                  }
                   className="aspect-[9/16] w-full cursor-pointer object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
+                  onClick={() => handleVideoClick(i)}
+                  onMouseEnter={() => handleHoverPlay(i)}
+                  onMouseLeave={() => handleHoverLeave(i)}
                 />
 
+                {/* OVERLAY */}
                 {activeVideo !== i && (
                   <>
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent transition-all duration-700 group-hover:from-black/20 group-hover:via-transparent" />
@@ -177,7 +181,6 @@ export default function Depoimentos() {
 
                         <div className="mt-4 flex items-center gap-3">
                           <span className="h-px w-8 bg-white/50" />
-
                           <p className="text-sm font-medium text-white">
                             {d.name}
                           </p>
@@ -188,15 +191,14 @@ export default function Depoimentos() {
                 )}
               </div>
 
+              {/* FOOTER */}
               {activeVideo === i && (
                 <figcaption className="mt-5 px-1">
                   <div className="flex items-center gap-3">
                     <span className="h-px w-8 bg-primary/60" />
-
                     <p className="text-sm font-medium text-foreground">
                       {d.name}
                     </p>
-
                     <span className="text-xs text-muted-foreground">
                       · {d.role}
                     </span>
@@ -207,6 +209,7 @@ export default function Depoimentos() {
           ))}
         </div>
 
+        {/* STATS */}
         <div className="mt-20 grid gap-px overflow-hidden rounded-[2rem] border border-border bg-border sm:grid-cols-2 md:grid-cols-4">
           {[
             ["+500", "Mulheres atravessaram"],
@@ -214,14 +217,8 @@ export default function Depoimentos() {
             ["4.9★", "Avaliação média"],
             ["98%", "Recomendariam"],
           ].map(([n, l]) => (
-            <div
-              key={l}
-              className="bg-card p-7 text-center"
-            >
-              <p className="font-serif text-4xl text-primary">
-                {n}
-              </p>
-
+            <div key={l} className="bg-card p-7 text-center">
+              <p className="font-serif text-4xl text-primary">{n}</p>
               <p className="mt-2 text-xs uppercase tracking-[0.22em] text-muted-foreground">
                 {l}
               </p>
