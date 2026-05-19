@@ -122,11 +122,18 @@ export default function Depoimentos() {
                   muted={activeVideo !== i}
                   disablePictureInPicture
                   controlsList="nodownload noplaybackrate"
+                  style={{
+                    WebkitAppearance: "none",
+                  }}
                   className={`
                     relative z-10 aspect-[9/16] w-full cursor-pointer object-cover
                     transition-transform duration-[1.4s] ease-out group-hover:scale-105
+
                     [&::-webkit-media-controls-overlay-play-button]:hidden
                     [&::-webkit-media-controls-start-playback-button]:hidden
+                    [&::-webkit-media-controls-play-button]:block
+                    [&::-webkit-media-controls-panel]:flex
+
                     ${
                       activeVideo !== i
                         ? "[&::-webkit-media-controls]:opacity-0"
@@ -171,7 +178,7 @@ export default function Depoimentos() {
                       }
                     });
 
-                    // ativa player atual
+                    // ativa vídeo atual
                     setActiveVideo(i);
 
                     // ativa som
