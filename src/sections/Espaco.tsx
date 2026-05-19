@@ -36,11 +36,11 @@ export default function Espaco() {
     }
   }, []);
 
-  // PREVIEW DESKTOP (Hover)
+  // PREVIEW DESKTOP (Hover controlado)
   const handleMouseEnter = async () => {
     if (window.innerWidth < 768) return;
     
-    // Só faz o preview se o usuário ainda não clicou para interagir com som
+    // Só faz o preview rápido se o usuário ainda não ativou o play real
     if (videoRef.current && !activeVideo) {
       try {
         videoRef.current.muted = true;
@@ -52,6 +52,7 @@ export default function Espaco() {
   const handleMouseLeave = () => {
     if (window.innerWidth < 768) return;
     
+    // Garante que o preview pare e resete para o início ao tirar o mouse
     if (videoRef.current && !activeVideo) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0.1;
@@ -107,33 +108,26 @@ export default function Espaco() {
                 className={`relative z-10 aspect-video w-full cursor-pointer object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105 ${
                   !activeVideo ? "[&::-webkit-media-controls]:opacity-0" : "[&::-webkit-media-controls]:opacity-100"
                 }`}
-                onClick={async (e) => {
+                onClick={async () => {
                   if (!videoRef.current) return;
                   const video = videoRef.current;
 
+                  // Se não foi ativado ainda, o clique liga o áudio e engaja o player nativo
                   if (!activeVideo) {
-                    // Primeiro clique: Ativa áudio, remove overlay e força o play
                     setActiveVideo(true);
                     video.muted = false;
                     try {
                       await video.play();
                     } catch {}
-                  } else {
-                    // Cliques seguintes: Alterna entre Play e Pause naturalmente
-                    if (video.paused) {
-                      video.play().catch(() => {});
-                    } else {
-                      video.pause();
-                    }
                   }
+                  // Removida a trava do else para deixar os botões nativos de play/pause funcionarem 100% livres
                 }}
                 onPlay={() => {
                   setActiveVideo(true);
                   if (videoRef.current) videoRef.current.muted = false;
                 }}
                 onPause={() => {
-                  // Se o vídeo foi pausado no meio da reprodução, mantém o estado ativo 
-                  // para não sumir a barra de controles nativa na cara do usuário
+                  // Só desativa o estado se o vídeo realmente chegar ao fim completo
                   if (videoRef.current && videoRef.current.currentTime >= videoRef.current.duration) {
                     setActiveVideo(false);
                   }
