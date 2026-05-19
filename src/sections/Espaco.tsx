@@ -30,42 +30,44 @@ export default function Espaco() {
 
   const [isClicked, setIsClicked] = useState(false);
 
+  // PREVIEW DESKTOP
   const handleMouseEnter = async () => {
+    if (window.innerWidth < 768) return;
+
     if (videoRef.current && !isClicked) {
       try {
         videoRef.current.muted = true;
         await videoRef.current.play();
-      } catch (error) {
-        console.log(error);
-      }
+      } catch {}
     }
   };
 
   const handleMouseLeave = () => {
+    if (window.innerWidth < 768) return;
+
     if (videoRef.current && !isClicked) {
       videoRef.current.pause();
-      videoRef.current.currentTime = 0;
+      videoRef.current.currentTime = 0.1;
     }
   };
 
+  // PLAYER REAL
   const handleClick = async () => {
-    if (videoRef.current) {
-      try {
-        setIsClicked(true);
+    if (!videoRef.current) return;
 
-        videoRef.current.controls = true;
-        videoRef.current.muted = false;
+    try {
+      setIsClicked(true);
 
-        await videoRef.current.play();
-      } catch (error) {
-        console.log(error);
-      }
-    }
+      videoRef.current.muted = false;
+
+      await videoRef.current.play();
+    } catch {}
   };
 
   return (
     <section id="espaco" className="relative py-10 md:py-10">
       <div className="mx-auto max-w-7xl px-6 md:px-10">
+
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -84,6 +86,8 @@ export default function Espaco() {
         </motion.div>
 
         <div className="mt-12 grid items-center gap-12 md:mt-16 md:grid-cols-12">
+
+          {/* VIDEO */}
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -98,28 +102,55 @@ export default function Espaco() {
               onClick={handleClick}
             >
               <video
-                ref={videoRef}
+                ref={(el) => {
+                  videoRef.current = el;
+
+                  // força thumb no mobile
+                  if (el) {
+                    el.currentTime = 0.1;
+                  }
+                }}
                 src="/videos/espaco.mp4"
                 playsInline
                 preload="metadata"
                 controls={isClicked}
-                className="aspect-video w-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
+                muted={!isClicked}
+                disablePictureInPicture
+                controlsList="nodownload noplaybackrate"
+                style={{
+                  WebkitAppearance: "none",
+                }}
+                className={`
+                  relative z-10 aspect-video w-full object-cover
+                  transition-transform duration-[1.4s] ease-out group-hover:scale-105
+
+                  [&::-webkit-media-controls-overlay-play-button]:hidden
+                  [&::-webkit-media-controls-start-playback-button]:hidden
+                  [&::-webkit-media-controls-play-button]:block
+                  [&::-webkit-media-controls-panel]:flex
+
+                  ${
+                    !isClicked
+                      ? "[&::-webkit-media-controls]:opacity-0"
+                      : "[&::-webkit-media-controls]:opacity-100"
+                  }
+                `}
               />
 
+              {/* OVERLAY */}
               {!isClicked && (
                 <>
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-black/10 to-transparent transition-all duration-700 group-hover:from-black/10 group-hover:via-transparent" />
 
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 p-6 md:p-8">
-                    <div className="max-w-md">
-                    
-                    </div>
+                    <div className="max-w-md"></div>
                   </div>
                 </>
               )}
             </div>
           </motion.div>
 
+          {/* CONTENT */}
           <div className="md:col-span-5">
             <p className="font-serif text-2xl italic leading-snug text-foreground/80 md:text-3xl">
               Um dia inteiro de imersão em um espaço vivo, conectado à natureza
