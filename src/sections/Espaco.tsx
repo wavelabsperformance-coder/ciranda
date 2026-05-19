@@ -51,21 +51,6 @@ export default function Espaco() {
     }
   };
 
-  // PLAYER REAL
-  const handleClick = async () => {
-    if (!videoRef.current) return;
-
-    const video = videoRef.current;
-
-    try {
-      setIsClicked(true);
-
-      video.muted = false;
-
-      await video.play();
-    } catch {}
-  };
-
   return (
     <section id="espaco" className="relative py-10 md:py-10">
       <div className="mx-auto max-w-7xl px-6 md:px-10">
@@ -99,16 +84,14 @@ export default function Espaco() {
             className="relative md:col-span-7"
           >
             <div
-              className="group relative overflow-hidden rounded-[1.75rem] shadow-2xl shadow-foreground/10 cursor-pointer"
+              className="group relative overflow-hidden rounded-[1.75rem] shadow-2xl shadow-foreground/10"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
-              onClick={handleClick}
             >
               <video
                 ref={(el) => {
                   videoRef.current = el;
 
-                  // força thumb no mobile
                   if (el) {
                     el.currentTime = 0.1;
                   }
@@ -124,7 +107,7 @@ export default function Espaco() {
                   WebkitAppearance: "none",
                 }}
                 className={`
-                  relative z-10 aspect-video w-full object-cover
+                  relative z-10 aspect-video w-full cursor-pointer object-cover
                   transition-transform duration-[1.4s] ease-out group-hover:scale-105
 
                   [&::-webkit-media-controls-overlay-play-button]:hidden
@@ -136,6 +119,24 @@ export default function Espaco() {
                       : "[&::-webkit-media-controls]:opacity-100"
                   }
                 `}
+                onClick={async (e) => {
+                  e.stopPropagation();
+
+                  if (!videoRef.current) return;
+
+                  const video = videoRef.current;
+
+                  try {
+                    // ativa player
+                    setIsClicked(true);
+
+                    // ativa áudio
+                    video.muted = false;
+
+                    // toca vídeo
+                    await video.play();
+                  } catch {}
+                }}
                 onPlay={() => {
                   setIsClicked(true);
                 }}
