@@ -7,21 +7,21 @@ const depoimentos = [
     name: "Edvane Libório.",
     role: "Edição anterior",
     quote:
-      "Saí da Ciranda outra mulher. Algo se reorganizou dentro de mim que eu nem sabia que precisava.",
+      "Eu tinha muita dificuldade em falar e hoje eu me libertei.",
     video: "/videos/depoimento-1.mp4",
   },
   {
     name: "América Nejaim.",
     role: "Edição anterior",
     quote:
-      "Foi a travessia mais profunda da minha vida. Recomendo a toda mulher que sente o chamado.",
+      "A ciranda faz a gente se descobrir, evoluir.",
     video: "/videos/depoimento-2.mp4",
   },
   {
     name: "Aline Gizimti.",
     role: "Edição anterior",
     quote:
-      "Voltei mais leve, mais inteira, mais minha. A Juliana conduz com uma profundidade rara.",
+      "Como se eu tivesse sido curada das minhas dores.",
     video: "/videos/depoimento-3.mp4",
   },
 ];

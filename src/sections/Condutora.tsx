@@ -1,6 +1,6 @@
 import Reveal from "@/components/Reveal";
 
-const tags = ["Psicologia Junguiana", "Visão Sistêmica", "Tântrica", "Espiritualidade"];
+const tags = ["Psicologia Junguiana", "Visão Sistêmica", "Tantra", "Espiritualidade"];
 
 export default function Condutora() {
   return (
