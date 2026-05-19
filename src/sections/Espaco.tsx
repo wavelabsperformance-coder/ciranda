@@ -27,17 +27,21 @@ const features = [
 
 export default function Espaco() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isClicked, setIsClicked] = useState(false);
+  const [activeVideo, setActiveVideo] = useState(false);
 
+  // Define o frame inicial de forma isolada e segura
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.currentTime = 0.1;
     }
   }, []);
 
+  // PREVIEW DESKTOP (Hover)
   const handleMouseEnter = async () => {
     if (window.innerWidth < 768) return;
-    if (videoRef.current && !isClicked) {
+    
+    // Só faz o preview se o usuário ainda não clicou para interagir com som
+    if (videoRef.current && !activeVideo) {
       try {
         videoRef.current.muted = true;
         await videoRef.current.play();
@@ -47,7 +51,8 @@ export default function Espaco() {
 
   const handleMouseLeave = () => {
     if (window.innerWidth < 768) return;
-    if (videoRef.current && !isClicked) {
+    
+    if (videoRef.current && !activeVideo) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0.1;
     }
@@ -69,12 +74,13 @@ export default function Espaco() {
           <h2 className="mt-5 font-serif text-5xl leading-[1.05] text-foreground md:text-7xl text-balance">
             Fazenda{" "}
             <em className="text-primary not-italic">
-              TEste espaço
+              Saint Germain
             </em>
           </h2>
         </motion.div>
 
         <div className="mt-12 grid items-center gap-12 md:mt-16 md:grid-cols-12">
+
           {/* VIDEO */}
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
@@ -83,8 +89,8 @@ export default function Espaco() {
             transition={{ duration: 1 }}
             className="relative md:col-span-7"
           >
-            <div
-              className="group relative overflow-hidden rounded-[1.75rem] shadow-2xl shadow-foreground/10"
+            <div 
+              className="group relative isolate overflow-hidden rounded-[1.75rem] shadow-2xl shadow-foreground/10"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             >
@@ -93,41 +99,58 @@ export default function Espaco() {
                 src="/videos/espaco.mp4"
                 playsInline
                 preload="metadata"
-                controls={isClicked}
-                muted={!isClicked}
+                controls
+                muted={!activeVideo}
                 disablePictureInPicture
                 controlsList="nodownload noplaybackrate"
                 style={{ WebkitAppearance: "none" }}
                 className={`relative z-10 aspect-video w-full cursor-pointer object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105 ${
-                  !isClicked ? "[&::-webkit-media-controls]:opacity-0" : "[&::-webkit-media-controls]:opacity-100"
+                  !activeVideo ? "[&::-webkit-media-controls]:opacity-0" : "[&::-webkit-media-controls]:opacity-100"
                 }`}
                 onClick={async (e) => {
-                  e.stopPropagation();
                   if (!videoRef.current) return;
-                  try {
-                    setIsClicked(true);
-                    videoRef.current.muted = false;
-                    await videoRef.current.play();
-                  } catch {}
+                  const video = videoRef.current;
+
+                  if (!activeVideo) {
+                    // Primeiro clique: Ativa áudio, remove overlay e força o play
+                    setActiveVideo(true);
+                    video.muted = false;
+                    try {
+                      await video.play();
+                    } catch {}
+                  } else {
+                    // Cliques seguintes: Alterna entre Play e Pause naturalmente
+                    if (video.paused) {
+                      video.play().catch(() => {});
+                    } else {
+                      video.pause();
+                    }
+                  }
                 }}
-                onPlay={() => setIsClicked(true)}
+                onPlay={() => {
+                  setActiveVideo(true);
+                  if (videoRef.current) videoRef.current.muted = false;
+                }}
                 onPause={() => {
-                  if (videoRef.current && videoRef.current.currentTime < videoRef.current.duration) {
-                    setIsClicked(false);
+                  // Se o vídeo foi pausado no meio da reprodução, mantém o estado ativo 
+                  // para não sumir a barra de controles nativa na cara do usuário
+                  if (videoRef.current && videoRef.current.currentTime >= videoRef.current.duration) {
+                    setActiveVideo(false);
                   }
                 }}
               />
-              {!isClicked && (
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-black/10 to-transparent" />
+              {!activeVideo && (
+                <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-t from-black/30 via-black/10 to-transparent transition-all duration-700 group-hover:from-black/10 group-hover:via-transparent" />
               )}
             </div>
           </motion.div>
 
-          {/* CONTENT */}
+          {/* TEXTOS */}
           <div className="md:col-span-5">
             <p className="font-serif text-2xl italic leading-snug text-foreground/80 md:text-3xl">
               Um dia inteiro de imersão em um espaço vivo, conectado à natureza e ao sagrado feminino.
             </p>
+
             <div className="mt-8 grid gap-5 sm:grid-cols-2">
               {features.map(({ Icon, title, desc }, i) => (
                 <motion.div
@@ -145,6 +168,7 @@ export default function Espaco() {
               ))}
             </div>
           </div>
+
         </div>
       </div>
     </section>
