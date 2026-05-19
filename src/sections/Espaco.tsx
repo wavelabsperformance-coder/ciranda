@@ -55,12 +55,14 @@ export default function Espaco() {
   const handleClick = async () => {
     if (!videoRef.current) return;
 
+    const video = videoRef.current;
+
     try {
       setIsClicked(true);
 
-      videoRef.current.muted = false;
+      video.muted = false;
 
-      await videoRef.current.play();
+      await video.play();
     } catch {}
   };
 
@@ -68,6 +70,7 @@ export default function Espaco() {
     <section id="espaco" className="relative py-10 md:py-10">
       <div className="mx-auto max-w-7xl px-6 md:px-10">
 
+        {/* HEADER */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -126,8 +129,6 @@ export default function Espaco() {
 
                   [&::-webkit-media-controls-overlay-play-button]:hidden
                   [&::-webkit-media-controls-start-playback-button]:hidden
-                  [&::-webkit-media-controls-play-button]:block
-                  [&::-webkit-media-controls-panel]:flex
 
                   ${
                     !isClicked
@@ -135,6 +136,18 @@ export default function Espaco() {
                       : "[&::-webkit-media-controls]:opacity-100"
                   }
                 `}
+                onPlay={() => {
+                  setIsClicked(true);
+                }}
+                onPause={() => {
+                  if (
+                    videoRef.current &&
+                    videoRef.current.currentTime <
+                      videoRef.current.duration
+                  ) {
+                    setIsClicked(false);
+                  }
+                }}
               />
 
               {/* OVERLAY */}
